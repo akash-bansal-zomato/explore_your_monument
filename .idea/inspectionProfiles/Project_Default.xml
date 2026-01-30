@@ -1,0 +1,158 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="2">
+            <item index="0" class="java.lang.String" itemvalue="geoId" />
+            <item index="1" class="java.lang.String" itemvalue="geoIdhalla" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="alembic" />
+          <option value="amqp" />
+          <option value="ansible" />
+          <option value="appnope" />
+          <option value="arrow" />
+          <option value="asn1crypto" />
+          <option value="Babel" />
+          <option value="bcrypt" />
+          <option value="billiard" />
+          <option value="blinker" />
+          <option value="boto3" />
+          <option value="botocore" />
+          <option value="celery" />
+          <option value="certifi" />
+          <option value="cffi" />
+          <option value="chardet" />
+          <option value="click" />
+          <option value="confluent-kafka" />
+          <option value="contextlib2" />
+          <option value="coverage" />
+          <option value="cryptography" />
+          <option value="decorator" />
+          <option value="defusedxml" />
+          <option value="disposable-email-domains" />
+          <option value="dnspython" />
+          <option value="docutils" />
+          <option value="enum-compat" />
+          <option value="eventlet" />
+          <option value="Flask" />
+          <option value="Flask-Cache-Buster" />
+          <option value="Flask-Compress" />
+          <option value="Flask-DebugToolbar" />
+          <option value="Flask-Login" />
+          <option value="flask-mongoengine" />
+          <option value="Flask-WTF" />
+          <option value="flower" />
+          <option value="funcsigs" />
+          <option value="future" />
+          <option value="futures" />
+          <option value="gevent" />
+          <option value="google-api-python-client" />
+          <option value="google-oauth" />
+          <option value="greenlet" />
+          <option value="gunicorn" />
+          <option value="healthcheck" />
+          <option value="httplib2" />
+          <option value="idna" />
+          <option value="ipaddress" />
+          <option value="ipython" />
+          <option value="ipython-genutils" />
+          <option value="itsdangerous" />
+          <option value="jedi" />
+          <option value="Jinja2" />
+          <option value="jmespath" />
+          <option value="kombu" />
+          <option value="LEPL" />
+          <option value="Mako" />
+          <option value="MarkupSafe" />
+          <option value="mock" />
+          <option value="mongoengine" />
+          <option value="Naked" />
+          <option value="newrelic" />
+          <option value="numpy" />
+          <option value="oauth2client" />
+          <option value="oauthlib" />
+          <option value="olefile" />
+          <option value="paramiko" />
+          <option value="pbr" />
+          <option value="pexpect" />
+          <option value="phonenumbers" />
+          <option value="pickleshare" />
+          <option value="Pillow" />
+          <option value="probableparsing" />
+          <option value="prompt-toolkit" />
+          <option value="protobuf" />
+          <option value="ptyprocess" />
+          <option value="py" />
+          <option value="pyasn1" />
+          <option value="pyasn1-modules" />
+          <option value="pycparser" />
+          <option value="pycrypto" />
+          <option value="pycryptodomex" />
+          <option value="Pygments" />
+          <option value="pyjwkest" />
+          <option value="PyJWT" />
+          <option value="pymongo" />
+          <option value="PyMySQL" />
+          <option value="PyNaCl" />
+          <option value="pyOpenSSL" />
+          <option value="PyPDF2" />
+          <option value="pysolr" />
+          <option value="pytest" />
+          <option value="pytest-cov" />
+          <option value="python-crfsuite" />
+          <option value="python-dateutil" />
+          <option value="python-editor" />
+          <option value="python-magic" />
+          <option value="python-social-auth" />
+          <option value="python3-openid" />
+          <option value="pytz" />
+          <option value="PyYAML" />
+          <option value="raven" />
+          <option value="redis" />
+          <option value="requests" />
+          <option value="requests-file" />
+          <option value="requests-oauthlib" />
+          <option value="retrying" />
+          <option value="rsa" />
+          <option value="s3transfer" />
+          <option value="Shapely" />
+          <option value="shellescape" />
+          <option value="simplegeneric" />
+          <option value="simplejson" />
+          <option value="six" />
+          <option value="social-auth-app-flask" />
+          <option value="social-auth-app-flask-mongoengine" />
+          <option value="social-auth-core" />
+          <option value="social-auth-storage-mongoengine" />
+          <option value="SQLAlchemy" />
+          <option value="stackimpact" />
+          <option value="tldextract" />
+          <option value="tornado" />
+          <option value="traitlets" />
+          <option value="uritemplate" />
+          <option value="urllib3" />
+          <option value="usaddress" />
+          <option value="uWSGI" />
+          <option value="validators" />
+          <option value="vine" />
+          <option value="Wand" />
+          <option value="wcwidth" />
+          <option value="Werkzeug" />
+          <option value="wrapt" />
+          <option value="WTForms" />
+          <option value="ratelimiter" />
+          <option value="ddtrace" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
