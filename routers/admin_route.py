@@ -5,22 +5,16 @@ admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
 
 @admin_bp.route('/monuments', methods=['GET'])
 def list_monuments():
-    data = MonumentAdminService.get_monument_list()
-    return jsonify(data)
+    return jsonify(MonumentAdminService.get_all_groups())
 
 @admin_bp.route('/monuments', methods=['POST'])
 def save_monument():
-    data = request.json
-    mon_id = data.get('id')
-    
-    if mon_id:
-        MonumentAdminService.update_existing_monument(mon_id, data)
-        return jsonify({"message": "Updated successfully"})
-    else:
-        new_id = MonumentAdminService.create_monument(data)
-        return jsonify({"message": "Created successfully", "id": new_id})
+    res = MonumentAdminService.save_monument_group(request.json)
+    return jsonify({"id": res, "status": "success"})
 
 @admin_bp.route('/monuments/<id>', methods=['DELETE'])
-def remove_monument(id):
-    MonumentAdminService.delete_monument(id)
-    return jsonify({"message": "Deleted successfully"})
+def delete_monument(id):
+    from models.monument import mongo
+    from bson.objectid import ObjectId
+    mongo.db.monuments.delete_one({"_id": ObjectId(id)})
+    return jsonify({"status": "deleted"})

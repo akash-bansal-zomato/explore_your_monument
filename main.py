@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, render_template, send_from_directory
 from model.monument import mongo  # Import the instance
-import logging
+import logging,os
 
 # Import routers
 # In main.py
@@ -57,6 +57,8 @@ if not os.path.exists(UPLOAD_FOLDER):
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+print(app.url_map)
 
 if __name__ == "__main__":
     logger.info("Starting Audio Generation API...")
