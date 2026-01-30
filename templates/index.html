@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Monument Admin Dashboard</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #f0f2f5; }
+        #map { flex: 3; height: 100%; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        #admin-panel { flex: 1; padding: 25px; background: white; overflow-y: auto; z-index: 1000; }
+
+        h2 { color: #1a73e8; margin-top: 0; border-bottom: 2px solid #e8f0fe; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #3c4043; }
+        
+        input[type="text"], textarea, select {
+            width: 100%; padding: 12px; border: 1px solid #dadce0;
+            border-radius: 8px; box-sizing: border-box; font-size: 14px;
+        }
+
+        .coords-group { display: flex; gap: 10px; }
+        
+        button {
+            width: 100%; padding: 12px; margin-top: 10px; border: none;
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        
+        .btn-primary { background: #1a73e8; color: white; }
+        .btn-primary:hover { background: #1765cc; }
+        .btn-danger { background: #ea4335; color: white; }
+        .btn-secondary { background: #f1f3f4; color: #3c4043; }
+
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        .hint { font-size: 12px; color: #70757a; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div id="admin-panel">
+    <h2>Monument Admin</h2>
+
+    <div class="form-group">
+        <label>Select Monument</label>
+        <select id="monument-selector">
+            <option value="new">-- Create New Monument --</option>
+        </select>
+    </div>
+
+    <hr>
+
+    <input type="hidden" id="mon-id">
+    
+    <div class="form-group">
+        <label>Monument Name</label>
+        <input type="text" id="mon-name" placeholder="e.g. Statue of Liberty">
+    </div>
+
+    <div class="form-group">
+        <label>Coordinates</label>
+        <div class="coords-group">
+            <input type="text" id="lat" placeholder="Lat">
+            <input type="text" id="lng" placeholder="Lng">
+        </div>
+        <p class="hint">Click map to auto-fill coordinates</p>
+    </div>
+
+    <div class="form-group">
+        <label>Quiz Question</label>
+        <textarea id="mon-question" rows="3" placeholder="Ask something about this place..."></textarea>
+    </div>
+
+    <button id="save-btn" class="btn-primary">Save Monument</button>
+    <button id="clear-btn" class="btn-secondary">Clear Form</button>
+    <button id="delete-btn" class="btn-danger" style="display:none">Delete Monument</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    /** * 1. INITIALIZE GLOBAL VARIABLES 
+     * We define these at the top so all functions can see them 
+     **/
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let activeMarker = null;
+    let existingMarkersLayer = L.featureGroup().addTo(map);
+    let allMonuments = [];
+
+    // DOM Elements
+    const elId = document.getElementById('mon-id');
+    const elName = document.getElementById('mon-name');
+    const elLat = document.getElementById('lat');
+    const elLng = document.getElementById('lng');
+    const elQues = document.getElementById('mon-question');
+    const elSelector = document.getElementById('monument-selector');
+    const btnSave = document.getElementById('save-btn');
+    const btnDelete = document.getElementById('delete-btn');
+    const btnClear = document.getElementById('clear-btn');
+
+    /** * 2. CORE FUNCTIONS 
+     **/
+
+    // Fetch existing data from Flask
+    async function fetchMonuments() {
+        try {
+            const res = await fetch('/admin/monuments');
+            allMonuments = await res.json();
+            
+            // Reset Map Markers
+            existingMarkersLayer.clearLayers();
+            elSelector.innerHTML = '<option value="new">-- Create New Monument --</option>';
+
+            allMonuments.forEach(mon => {
+                const [lng, lat] = mon.location.coordinates;
+                const marker = L.marker([lat, lng]).addTo(existingMarkersLayer);
+                marker.bindPopup(`<b>${mon.name}</b><br><button onclick="editFromMap('${mon._id}')">Edit</button>`);
+
+                // Add to dropdown
+                const opt = document.createElement('option');
+                opt.value = mon._id;
+                opt.textContent = mon.name;
+                elSelector.appendChild(opt);
+            });
+        } catch (err) {
+            console.error("Fetch Error:", err);
+        }
+    }
+
+    // Save or Update
+    async function saveMonument() {
+        const payload = {
+            id: elId.value || null,
+            name: elName.value,
+            question: elQues.value,
+            lat: parseFloat(elLat.value),
+            lng: parseFloat(elLng.value)
+        };
+
+        if (!payload.name || isNaN(payload.lat)) {
+            alert("Please provide a name and select a location on the map.");
+            return;
+        }
+
+        try {
+            const res = await fetch('/admin/monuments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert("Database Updated Successfully!");
+                resetForm();
+                await fetchMonuments();
+            }
+        } catch (err) {
+            alert("Error saving data. Check console.");
+        }
+    }
+
+    // Delete
+    async function deleteMonument() {
+        const id = elId.value;
+        if (!id || !confirm("Delete this monument forever?")) return;
+
+        try {
+            const res = await fetch(`/admin/monuments/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                alert("Deleted.");
+                resetForm();
+                await fetchMonuments();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // Load selected monument into form
+    function handleSelection() {
+        const selectedId = elSelector.value;
+        if (selectedId === 'new') {
+            resetForm();
+            return;
+        }
+
+        const mon = allMonuments.find(m => m._id === selectedId);
+        if (mon) {
+            elId.value = mon._id;
+            elName.value = mon.name;
+            elQues.value = mon.question;
+            const [lng, lat] = mon.location.coordinates;
+            elLat.value = lat;
+            elLng.value = lng;
+
+            // Move Map
+            map.setView([lat, lng], 14);
+            if (activeMarker) map.removeLayer(activeMarker);
+            activeMarker = L.marker([lat, lng], {draggable: true}).addTo(map);
+
+            btnSave.textContent = "Update Monument";
+            btnDelete.style.display = "block";
+        }
+    }
+
+    function resetForm() {
+        elId.value = '';
+        elName.value = '';
+        elLat.value = '';
+        elLng.value = '';
+        elQues.value = '';
+        btnSave.textContent = "Save Monument";
+        btnDelete.style.display = "none";
+        elSelector.value = 'new';
+        if (activeMarker) map.removeLayer(activeMarker);
+        activeMarker = null;
+    }
+
+    // Global helper for the "Edit" button inside map popups
+    window.editFromMap = function(id) {
+        elSelector.value = id;
+        handleSelection();
+    };
+
+    /** * 3. EVENT LISTENERS 
+     **/
+
+    // Map Click
+    map.on('click', (e) => {
+        elLat.value = e.latlng.lat.toFixed(6);
+        elLng.value = e.latlng.lng.toFixed(6);
+
+        if (activeMarker) {
+            activeMarker.setLatLng(e.latlng);
+        } else {
+            activeMarker = L.marker(e.latlng, {draggable: true}).addTo(map);
+        }
+    });
+
+    // Button Clicks
+    btnSave.addEventListener('click', saveMonument);
+    btnDelete.addEventListener('click', deleteMonument);
+    btnClear.addEventListener('click', resetForm);
+    elSelector.addEventListener('change', handleSelection);
+
+    // Initial Load
+    fetchMonuments();
+
+</script>
+</body>
+</html>
